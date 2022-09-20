@@ -1,0 +1,28 @@
+---
+title: "Breeze_HW_5"
+author: "Kelley Breeze"
+date: "2022-09-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Tasks
+
+### 1. Read in the horseshoe crab data set and modify the variables as mentioned in the notes. Print the updated data object out.
+
+### 2. Create a two-way contingency table between the satellite and spine variables. Write text describing what two of the numbers in the table represent.
+
+### 3. Create a three way table between the color, spine, and satellite variables. Output the table. Then, using that table object, print our a two-way table between the spine an dsatelliet for crabs with "darker" color. Write text describing what one of the numbers in the table represents.
+
+### 4. Recreate the side-by-side bar plots below. Write text that comments on any patterns you see in one of the plots.
+
+### 5. Recreate the set of side-by-side bar plots below. You’ll need to look up how to orient the x-axis lables to 45 degrees. Write text that comments on any patterns you see.
+
+### 6. Recreate the summary statistics below. Write text that interprets one of the sets of summary stats.
+
+### 7. Recreate the boxplots below. Write text that comments on any patterns you see.
+
+### 8. Report the correlation between the weight and width variables. Then recreate the scatterplot below. Write text that comments on any patterns you see.
