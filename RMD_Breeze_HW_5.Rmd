@@ -7,19 +7,144 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
 
 # Tasks
 
-### 1. Read in the horseshoe crab data set and modify the variables as mentioned in the notes. Print the updated data object out.
+### 1. Read in the horseshoe crab data set and modify the variables as listed below. Print the updated data object out.
 
-### 2. Create a two-way contingency table between the satellite and spine variables. Write text describing what two of the numbers in the table represent.
+Reading in the horseshoe crab data set and saving as an R object called `crabs`
+```{r}
+crabs<-read_table('crabs.txt')
+```
 
-### 3. Create a three way table between the color, spine, and satellite variables. Output the table. Then, using that table object, print our a two-way table between the spine an dsatelliet for crabs with "darker" color. Write text describing what one of the numbers in the table represents.
+
+Modify the `color`, `spine condition` and `y` variables as listed below. Remove column of `NA` values.
+1.  `color` is a factor where:  
++   2=`light`  
++   3=`medium`  
++   4=`dark`  
++   5=`darker`  
+2.  `spine condition` is a factor where:  
++   1=`both good`  
++   2=`one worn or broken`  
++   3=`both worn or broken`  
+3.  `y` is a factor where:  
++   0=`No`  
++   1=`At`  
+
+```{r}
+crabs<- crabs%>%
+  mutate(
+    color= factor(color,
+                       levels = c(2, 3, 4, 5),
+                       labels = c("light",
+                                  "medium",
+                                  "dark",
+                                  "darker")),
+    spine = factor(spine,
+                   levels = c(1, 2, 3),
+                   labels = c("Both Good", "One Worn/Broken", "Both Worn/Broken")),
+    y = factor(y,
+               levels = c(0, 1),
+               labels = c("No", "At")),
+) %>%
+      select(color:y)
+```
+
+
+### 2. Create a two-way contingency table between the satellite (`y`) and `spine` variables. Write text describing what two of the numbers in the table represent.
+
+The contingency table created here gives us the frequency with which all of the combinations of the `y` variable and `spine` variable occur. The contingency table returns the following information from our data set:  
+
+
+1.  Number of crabs that have `No` "satellite" and a spine condition of `both good` = 11  
+2.  Number of crabs that have `No` "satellite" and `one worn or broken` spine = 8  
+3.  Number of crabs that have `No` "satellite" and `both worn or broken` spine = 43  
+4.  Number of crabs that have `At` "satellite" and `both good` = 26  
+5.  Number of crabs that have `At` "satellite" and `one worn or broken` = 7  
+6.  Number of crabs that have `At` "satellite" and `both worn or broken` = 78  
+
+```{r}
+satelliteSpine <- table(crabs$y,
+                        crabs$spine)
+satelliteSpine
+```
+
+
+
+
+### 3. Create a three way table between the `color`, `spine`, and satellite (`y`) variables. Output the table. Then, using that table object, print our a two-way table between the spine and satellite for crabs with "darker" color. Write text describing what one of the numbers in the table represents.
+
+Creating a three way table between the `color`, `spine` and `y` variables, saving it as an R object called `colorSpineSatellite` and printing the table.
+```{r}
+colorSpineSatellite<- table(crabs$color,
+                            crabs$spine,
+                            crabs$y)
+colorSpineSatellite
+```
+
+The code below takes the `colorSpineSatillite` object that we just created and prints out a two-way table between the spine and satellite for crabs with "`darker`" `color`. The new contingency table, `spineSatellite`, is a two way contingency table created from the previous three way table `colorSpineSatellite`. In this table we a returning the frequencies of the `spine` and `y` variable combinations for the `darker` level of our `color` variable.  If we look at the `spineSatellite` table we can see that we have 1 crab in the data set that is `darker`, with `No` "satellite" and `both good` for the `spine` condition.
+```{r}
+spineSatellite<- colorSpineSatellite[4, , ]
+
+spineSatellite
+```
+
+
 
 ### 4. Recreate the side-by-side bar plots below. Write text that comments on any patterns you see in one of the plots.
 
+Code for the first plot, looking at Satellite/No satellite and crab color
+```{r}
+g1 <- ggplot(data = crabs, aes(x=color))
+
+g1 + geom_bar(aes(fill = y), position = "dodge") + 
+  labs(x = "Female Crab Color") + 
+  scale_fill_discrete(name=NULL, labels = c("No Satellite", "At least 1 Sattelite")) + 
+  coord_flip()  
+```
+
+Code for the second plot, looking at Satellite/No satellite and spine condition
+```{r}
+g2 <- ggplot(data = crabs, aes(x=spine))
+
+g2 + geom_bar(aes(fill = y), position = "dodge") + 
+  labs(x = "Female Crab Spine Condition") + 
+  scale_fill_discrete(name=NULL, labels = c("No Satellite", "At least 1 Sattelite")) + 
+  coord_flip()  
+```
+
+
+Code for the third plot, looking at spine condition and crab color
+```{r}
+g3 <- ggplot(data = crabs, aes(x=spine))
+
+g3 + geom_bar(aes(fill = color), position = "dodge") + 
+  labs(x = "Female Crab Spine Condition") + 
+  scale_fill_discrete(name="Female Crab Color") + 
+  coord_flip()  
+```
+
+
+
+
 ### 5. Recreate the set of side-by-side bar plots below. You’ll need to look up how to orient the x-axis lables to 45 degrees. Write text that comments on any patterns you see.
+
+Code for the side-by-side bar plots, looking at crab color and satellite `y` by the spine condition.
+```{r}
+g4 <- ggplot(data = crabs, aes(x=color))
+
+g4 + geom_bar(aes(fill = y), position = "dodge") + 
+  labs(x = "Female Crab Spine Condition") + 
+  guides(x=guide_axis(angle=45)) +
+  scale_fill_discrete(name=NULL, labels = c("No Satellite", "At least 1 Sattelite")) +
+  facet_grid(cols=vars(spine), labeller = label_both)
+```
+
+
+
 
 ### 6. Recreate the summary statistics below. Write text that interprets one of the sets of summary stats.
 
