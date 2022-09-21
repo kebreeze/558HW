@@ -2,7 +2,9 @@
 title: "Breeze_HW_5"
 author: "Kelley Breeze"
 date: "2022-09-20"
-output: html_document
+output: 
+  html_document: 
+    toc: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -31,8 +33,8 @@ Modify the `color`, `spine condition` and `y` variables as listed below. Remove 
 +   2=`one worn or broken`  
 +   3=`both worn or broken`  
 3.  `y` is a factor where:  
-+   0=`No`  
-+   1=`At`  
++   0=`No Satellite`  
++   1=`At least 1 Sattelite`  
 
 ```{r}
 crabs<- crabs%>%
@@ -48,7 +50,7 @@ crabs<- crabs%>%
                    labels = c("Both Good", "One Worn/Broken", "Both Worn/Broken")),
     y = factor(y,
                levels = c(0, 1),
-               labels = c("No", "At")),
+               labels = c("No Satellite", "At least 1 Satellite")),
 ) %>%
       select(color:y)
 ```
@@ -102,7 +104,7 @@ g1 <- ggplot(data = crabs, aes(x=color))
 
 g1 + geom_bar(aes(fill = y), position = "dodge") + 
   labs(x = "Female Crab Color") + 
-  scale_fill_discrete(name=NULL, labels = c("No Satellite", "At least 1 Sattelite")) + 
+  scale_fill_discrete(name=NULL) + 
   coord_flip()  
 ```
 
@@ -112,7 +114,7 @@ g2 <- ggplot(data = crabs, aes(x=spine))
 
 g2 + geom_bar(aes(fill = y), position = "dodge") + 
   labs(x = "Female Crab Spine Condition") + 
-  scale_fill_discrete(name=NULL, labels = c("No Satellite", "At least 1 Sattelite")) + 
+  scale_fill_discrete(name=NULL) + 
   coord_flip()  
 ```
 
@@ -134,20 +136,73 @@ g3 + geom_bar(aes(fill = color), position = "dodge") +
 
 Code for the side-by-side bar plots, looking at crab color and satellite `y` by the spine condition.
 ```{r}
-g4 <- ggplot(data = crabs, aes(x=color))
+g5 <- ggplot(data = crabs, aes(x=color))
 
-g4 + geom_bar(aes(fill = y), position = "dodge") + 
+g5 + geom_bar(aes(fill = y), position = "dodge") + 
   labs(x = "Female Crab Spine Condition") + 
   guides(x=guide_axis(angle=45)) +
-  scale_fill_discrete(name=NULL, labels = c("No Satellite", "At least 1 Sattelite")) +
+  scale_fill_discrete(name=NULL) + 
   facet_grid(cols=vars(spine), labeller = label_both)
 ```
 
 
 
 
-### 6. Recreate the summary statistics below. Write text that interprets one of the sets of summary stats.
+### 6. Recreate the summary statistics (avg, sd, median, IQR) for the `color` and `y` variables below. Write text that interprets one of the sets of summary stats.
 
-### 7. Recreate the boxplots below. Write text that comments on any patterns you see.
+```{r}
+crabs%>%
+  group_by(color, y)%>%
+  summarise(Avg = mean(weight), Sd = sd(weight), Median = median(weight), IQR = IQR(weight))
+```
+
+### 7. Recreate the boxplots below showing no satellite and at least 1 sattelite for weight and width. Write text that comments on any patterns you see.
+
+```{r}
+g7 <- ggplot(crabs, aes(x = y, y = weight))
+
+weightBox<- g7 + geom_boxplot() + 
+  labs(title = "Boxplot for Weight") + 
+  guides(fill = legend) + 
+  geom_jitter(aes(colour=y))
+
+weightBox
+```
+
+```{r}
+g7 <- ggplot(crabs, aes(x = y, y = (weight*0.01)))
+
+weightBoxScaled<- g7 + geom_boxplot() + 
+  labs(title = "Boxplot for Weight", 
+       y = "weight") + 
+  geom_jitter(aes(colour=y))
+
+weightBoxScaled
+```
+
 
 ### 8. Report the correlation between the weight and width variables. Then recreate the scatterplot below. Write text that comments on any patterns you see.
+
+The correlation between the weight and width variables is 0.899067.
+```{r}
+Correlation<- cor(select(crabs, weight, width), method = "spearman")
+
+Correlation
+```
+
+```{r}
+library(ggplot2)
+```
+
+
+
+Scatterplot showing `weight` and `width` of the crabs, grouped by `color` and `y` variables
+```{r}
+g8 <- ggplot(crabs, aes(x=weight, y=width))
+
+g8 + geom_point(aes(shape = y, color = color)) +
+  geom_smooth(method = lm)
+```
+
+
+
