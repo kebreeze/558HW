@@ -1,10 +1,11 @@
 ---
-title: "Breeze_HW_5"
+title: "Breeze HW 5"
 author: "Kelley Breeze"
 date: "2022-09-20"
 output: 
   html_document: 
     toc: yes
+    toc_float: TRUE
 ---
 
 ```{r setup, include=FALSE}
@@ -14,15 +15,17 @@ library(tidyverse)
 
 # Tasks
 
-### 1. Read in the horseshoe crab data set and modify the variables as listed below. Print the updated data object out.
+### 1. Read in/modify data.
+
 
 Reading in the horseshoe crab data set and saving as an R object called `crabs`
-```{r}
+```{r, warning=FALSE}
 crabs<-read_table('crabs.txt')
 ```
 
 
-Modify the `color`, `spine condition` and `y` variables as listed below. Remove column of `NA` values.
+Modify the `color`, `spine condition` and `y` variables as listed below. Remove column of `NA` values. Overwrite the `crabs` object to save these changes.
+
 1.  `color` is a factor where:  
 +   2=`light`  
 +   3=`medium`  
@@ -56,28 +59,39 @@ crabs<- crabs%>%
 ```
 
 
-### 2. Create a two-way contingency table between the satellite (`y`) and `spine` variables. Write text describing what two of the numbers in the table represent.
-
-The contingency table created here gives us the frequency with which all of the combinations of the `y` variable and `spine` variable occur. The contingency table returns the following information from our data set:  
-
-
-1.  Number of crabs that have `No` "satellite" and a spine condition of `both good` = 11  
-2.  Number of crabs that have `No` "satellite" and `one worn or broken` spine = 8  
-3.  Number of crabs that have `No` "satellite" and `both worn or broken` spine = 43  
-4.  Number of crabs that have `At` "satellite" and `both good` = 26  
-5.  Number of crabs that have `At` "satellite" and `one worn or broken` = 7  
-6.  Number of crabs that have `At` "satellite" and `both worn or broken` = 78  
-
+Print out the updated `crabs` data set
 ```{r}
-satelliteSpine <- table(crabs$y,
-                        crabs$spine)
-satelliteSpine
+crabs
 ```
 
 
 
+### 2. Two-way contingency table.
 
-### 3. Create a three way table between the `color`, `spine`, and satellite (`y`) variables. Output the table. Then, using that table object, print our a two-way table between the spine and satellite for crabs with "darker" color. Write text describing what one of the numbers in the table represents.
+We are now going to create a two-way contingency table between the satellite (`y`) and `spine` variables. This will allow us to see a count of all possible combinations of these two variables.
+
+
+```{r}
+satelliteSpine <- table(crabs$spine,
+                        crabs$y)
+satelliteSpine
+```
+
+The contingency table created above gives us the frequency with which all of the combinations of the `y` variable and `spine` variable occur. The contingency table returns the following information from our data set:  
+
+
+1.  Number of crabs that have `No Satillite` "satellite" and a spine condition of `both good` = 11  
+2.  Number of crabs that have `No Satillite` "satellite" and `one worn or broken` spine = 8  
+3.  Number of crabs that have `No Satillite` "satellite" and `both worn or broken` spine = 43  
+4.  Number of crabs that have `At least 1 Satillite` "satellite" and `both good` = 26  
+5.  Number of crabs that have `At least 1 Satillite` "satellite" and `one worn or broken` = 7  
+6.  Number of crabs that have `At least 1 Satillite` "satellite" and `both worn or broken` = 78  
+
+
+### 3. Three-way contingency table.
+
+We are first going to create a three way table between the `color`, `spine`, and satellite (`y`) variables and save this as an R object called `colorSpineSatellite`. We will go ahead and print the `colorSpineSatellite` table. We will also look at the `str()` of the table so that we are sure that we are requesting the correct information in the next step. Next, we will use the `colorSpineSatellite` table to create a two-way table between the `spine` and `satellite` variables for only the crabs whose `color` is `darker`. We will save this table as an R object called `spineSatellite` and print it out.
+
 
 Creating a three way table between the `color`, `spine` and `y` variables, saving it as an R object called `colorSpineSatellite` and printing the table.
 ```{r}
@@ -87,7 +101,13 @@ colorSpineSatellite<- table(crabs$color,
 colorSpineSatellite
 ```
 
-The code below takes the `colorSpineSatillite` object that we just created and prints out a two-way table between the spine and satellite for crabs with "`darker`" `color`. The new contingency table, `spineSatellite`, is a two way contingency table created from the previous three way table `colorSpineSatellite`. In this table we a returning the frequencies of the `spine` and `y` variable combinations for the `darker` level of our `color` variable.  If we look at the `spineSatellite` table we can see that we have 1 crab in the data set that is `darker`, with `No` "satellite" and `both good` for the `spine` condition.
+
+In order to create our two-way table, we want to first look at `str(colotSpineSatellite)` to make sure that we are clear about how to request the specific parts of the data that we want to use in our two-way table of only `darker` crabs. We can see when we look at the `str()` that the `color` variable is the first listed and that `darker` is listed in the 4th position within the `color` variable. This means that to return all combinations of `spine` and `y` for the `darker` level of our `color` variable we can access it using `colorSpineSatellite[4, , ]`.
+```{r}
+str(colorSpineSatellite)
+```
+
+The code below takes the `colorSpineSatillite` object that we just created and prints out a two-way table between the spine and satellite for crabs with `darker` for the `color` variable. In this table we a returning the frequencies of the `spine` and `y` variable combinations for the `darker` level of our `color` variable only.  If we look at the `spineSatellite` table we can see that of the crabs that are `darker` in color, the majority of them (13 crabs) have `No Satellite` and `Both Worn/Broken` for the `spine` condition.
 ```{r}
 spineSatellite<- colorSpineSatellite[4, , ]
 
@@ -96,9 +116,10 @@ spineSatellite
 
 
 
-### 4. Recreate the side-by-side bar plots below. Write text that comments on any patterns you see in one of the plots.
+### 4. Side-by-side barplots with flipped coordinates.
 
-Code for the first plot, looking at Satellite/No satellite and crab color
+
+Code for the first plot, looking at `At least 1 Satellite`/`No Satellite` and crab `color`. 
 ```{r}
 g1 <- ggplot(data = crabs, aes(x=color))
 
@@ -108,7 +129,17 @@ g1 + geom_bar(aes(fill = y), position = "dodge") +
   coord_flip()  
 ```
 
-Code for the second plot, looking at Satellite/No satellite and spine condition
+
+When we look at the above plot we can see that most of the crabs in this data set have spines where `Both Worn/Broken`. When we look at the crabs within this sub-group, we can see that of the crabs with `Both Worn/Broken` for their `spine` condition, the number that also have `At least 1 Satellite` is almost double the number in this sub-group that have `No Satellite`. 
+
+
+While we cannot say why this is, we can speculate that this may have something to do with the `At least 1 Satellite`/`No Satellite` variable itself. In the variable description for the `y` variable, which gives us information on `At least 1 Satellite`/`No Satellite`, we are told that in female crabs the satellite is used for mating, and that females that have `At least 1 Satellite` will encounter male crab groups around her that may fertilize her eggs. It is possible that these groupings of male crabs around female crabs with `At least 1 Satellite` tend to cause damage to the `spine` condition of the female, resulting in more of these females presenting with `Both Worn/Broken` spine condition.
+
+
+
+
+
+Code for the second plot, looking at `At least 1 Satellite`/`No Satellite` and `spine` condition
 ```{r}
 g2 <- ggplot(data = crabs, aes(x=spine))
 
@@ -119,7 +150,7 @@ g2 + geom_bar(aes(fill = y), position = "dodge") +
 ```
 
 
-Code for the third plot, looking at spine condition and crab color
+Code for the third plot, looking at `spine` condition and crab `color`
 ```{r}
 g3 <- ggplot(data = crabs, aes(x=spine))
 
@@ -132,9 +163,10 @@ g3 + geom_bar(aes(fill = color), position = "dodge") +
 
 
 
-### 5. Recreate the set of side-by-side bar plots below. You’ll need to look up how to orient the x-axis lables to 45 degrees. Write text that comments on any patterns you see.
+### 5. Side-by-side bar plots with faceting.
 
-Code for the side-by-side bar plots, looking at crab color and satellite `y` by the spine condition.
+
+Code for the side-by-side bar plots, looking at crab `color` and satellite `y` by the `spine` condition. Use `guides()` to angle the x-axis labels at 45 degrees.
 ```{r}
 g5 <- ggplot(data = crabs, aes(x=color))
 
@@ -146,22 +178,35 @@ g5 + geom_bar(aes(fill = y), position = "dodge") +
 ```
 
 
+We can see in the side-by-side bar plots above that most of the crabs in this data set have a `spine` condition of `Both Worn/Broken`. When we look at just the crabs with `Both Worn/Broken` for `spine`, we can see that the largest number within this group are crabs that are `medium` in `color` and have `At least 1 Satellite`. Overall, there are few crabs in this data set that only have `One Worn/Broken` for the `spine` condition. While there are more crabs with `Both Good` for their `spine` condition than with `One Worn/Broken`, it is still relatively small compared to the `Both Worn/Broken` group.
 
 
-### 6. Recreate the summary statistics (avg, sd, median, IQR) for the `color` and `y` variables below. Write text that interprets one of the sets of summary stats.
+
+### 6. Summary statistics.
+
+The code below creates summary statistics on the `weight` variable (`avg`, `sd`, `median`, `IQR`) across the levels of the `color` and `y` variables.
 
 ```{r}
-crabs%>%
+crabStats<- crabs%>%
   group_by(color, y)%>%
   summarise(Avg = mean(weight), Sd = sd(weight), Median = median(weight), IQR = IQR(weight))
+
+crabStats
 ```
 
-### 7. Recreate the boxplots below showing no satellite and at least 1 sattelite for weight and width. Write text that comments on any patterns you see.
+
+Let's take a look at the summary stats for crabs who are `medium` in `color` and have `At least 1 Satellite`. We can see that these crabs have an average weight of 2649.159 with a median value of 2700. This tells us that our data for `medium` crabs with `At least 1 Satellite` has a negative skew. This means that we have outliers within this group that have a `weight` that is far below the group average, pulling the mean lower than the mediian for our group. When we look at the standard deviation (615.1747) and IQR (800.00) values (which measure spread of our data) for the `medium` crabs with `At least 1 Satellite` we can see that this group has a large spread as compared to other groups in our data set. The IQR and sd for this group are larger than any other group in our data set.
+
+
+
+### 7. Boxplots
+
+The code below creates a boxplot showing `No Satellite` and `At least 1 Satellite` for `weight`.
 
 ```{r}
-g7 <- ggplot(crabs, aes(x = y, y = weight))
+g7a <- ggplot(crabs, aes(x = y, y = weight))
 
-weightBox<- g7 + geom_boxplot() + 
+weightBox<- g7a + geom_boxplot() + 
   labs(title = "Boxplot for Weight") + 
   guides(fill = legend) + 
   geom_jitter(aes(colour=y))
@@ -169,34 +214,39 @@ weightBox<- g7 + geom_boxplot() +
 weightBox
 ```
 
-```{r}
-g7 <- ggplot(crabs, aes(x = y, y = (weight*0.01)))
 
-weightBoxScaled<- g7 + geom_boxplot() + 
-  labs(title = "Boxplot for Weight", 
-       y = "weight") + 
+In the boxplot for `weight` we can see that there is a wider spread in `weight` in the data for crabs with `At least 1 Satellite` as compared to the crabs with `No Satellite`. Additionally, we see that the median `weight` for crabs with `At least 1 Satellite` is higher than the median `weight` for crabs with `No Satellite`. Finally, we see a couple of very large extreme outliers for `weight` in our `At least 1 Satellite` group, as well as a cluster of outliers in the same group at the low end of `weight`.
+
+
+The code below creates a boxplot showing `No Satellite` and `At least 1 Satellite` for `width`.
+```{r}
+g7b <- ggplot(crabs, aes(x = y, y = width))
+
+widthBox<- g7b + geom_boxplot() + 
+  labs(title = "Boxplot for Width", 
+       y = "width") + 
   geom_jitter(aes(colour=y))
 
-weightBoxScaled
+widthBox
 ```
 
 
-### 8. Report the correlation between the weight and width variables. Then recreate the scatterplot below. Write text that comments on any patterns you see.
+In the boxplot for `width` we can see that the spread in `width` in the data for crabs with `At least 1 Satellite` is fairly similar to the range for the crabs with `No Satellite`, although the spread for crabs with `At least 1 Satellite` is still larger. Additionally, we see that the median `width` for crabs with `At least 1 Satellite` is higher than the median `width` for crabs with `No Satellite`. For `width` we also see a couple of very large extreme outliers in our `At least 1 Satellite` group, and several less extreme large outliers in our `No Satellite` group.
 
-The correlation between the weight and width variables is 0.899067.
+
+### 8. Correlation and scatterplot.
+
+
+The correlation between the weight and width variables is 0.899067. This means that these two variables have a strong positive linear relationship.
 ```{r}
 Correlation<- cor(select(crabs, weight, width), method = "spearman")
 
 Correlation
 ```
 
-```{r}
-library(ggplot2)
-```
 
 
-
-Scatterplot showing `weight` and `width` of the crabs, grouped by `color` and `y` variables
+Code to create scatterplot showing `weight` and `width` of the crabs, grouped by `color` and `y` variables. We have also overlayed a linear regression line on our scatterplot.
 ```{r}
 g8 <- ggplot(crabs, aes(x=weight, y=width))
 
@@ -205,4 +255,4 @@ g8 + geom_point(aes(shape = y, color = color)) +
 ```
 
 
-
+The scatterplot shows a strong, positive linear relationship between the `weight` and `width` variables in our data set. We can also see that there is a single very large crab in this data set who is `medium` in `color` and has `At least 1 Satellite`.
